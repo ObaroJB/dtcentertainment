@@ -1,13 +1,14 @@
-const { createServer } = require('http')
-const next = require('next')
+const { spawn } = require('child_process');
+const path = require('path');
 
-const app = next({ dev: false })
-const handle = app.getRequestHandler()
+const port = process.env.PORT || 3000;
 
-app.prepare().then(() => {
-  createServer((req, res) => {
-    handle(req, res)
-  }).listen(process.env.PORT || 3000, () => {
-    console.log('Server is running in production mode')
-  })
-})
+const child = spawn(
+  process.execPath,
+  [path.join(__dirname, 'node_modules', '.bin', 'next'), 'start', '-p', port],
+  { stdio: 'inherit', cwd: __dirname }
+);
+
+child.on('exit', (code) => {
+  process.exit(code);
+});
