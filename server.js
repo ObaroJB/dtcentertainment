@@ -1,14 +1,13 @@
-const { spawn } = require('child_process');
-const path = require('path');
+const { createServer } = require('http')
+const next = require('next')
 
-const port = process.env.PORT || 3000;
+const app = next({ dev: false })
+const handle = app.getRequestHandler()
 
-const child = spawn(
-  process.execPath,
-  [path.join(__dirname, 'node_modules', '.bin', 'next'), 'start', '-p', port],
-  { stdio: 'inherit', cwd: __dirname }
-);
-
-child.on('exit', (code) => {
-  process.exit(code);
-});
+app.prepare().then(() => {
+  createServer((req, res) => {
+    handle(req, res)
+  }).listen('passenger', () => {
+    console.log('Server is running via Passenger socket')
+  })
+})
