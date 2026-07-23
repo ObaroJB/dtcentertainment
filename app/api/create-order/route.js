@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { db } from "@/lib/firebaseAdmin";
 import { initializePaystackPayment } from "@/lib/paystack";
+import { checkAvailability } from "@/lib/inventory";
 
 // Very small in-memory rate limiter (per server instance)
 const recentRequests = new Map();
@@ -46,6 +47,15 @@ export async function POST(request) {
     }
     if (!Number.isFinite(unitPrice) || unitPrice <= 0) {
       return NextResponse.json({ error: "Invalid ticket price." }, { status: 400 });
+    }
+
+    // ---- Ticket cap check ----
+    const availability = await checkAvailability(db, ticketType, qty);
+    if (!availability.available) {
+      return NextResponse.json(
+        { error: "Sorry, that ticket type is sold out or doesn't have enough left." },
+        { status: 409 }
+      );
     }
 
     const totalAmountNaira = unitPrice * qty;

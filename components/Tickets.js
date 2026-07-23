@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import TicketModal from "./TicketModal";
 
@@ -12,12 +12,25 @@ const EVENT = {
   flyer: "/images/flyer1.jpeg",
   tiers: [
     { name: "Early Bird", price: 3500 },
-    
   ],
 };
 
 export default function Tickets() {
   const [open, setOpen] = useState(false);
+  const [availability, setAvailability] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/availability")
+      .then((res) => res.json())
+      .then((data) => setAvailability(data.tiers || {}))
+      .catch(() => setAvailability({}));
+  }, []);
+
+  // Figures out remaining count for the first (currently only) tier.
+  const tierName = EVENT.tiers[0].name;
+  const tierInfo = availability ? availability[tierName] : null;
+  const remaining = tierInfo ? tierInfo.capacity - tierInfo.sold : null;
+  const soldOut = remaining !== null && remaining <= 0;
 
   return (
     <section id="tickets" className="section" style={{ background: "var(--white)" }}>
@@ -45,7 +58,6 @@ export default function Tickets() {
         Get Your Ticket
       </motion.h2>
 
-      {/* Ticket-stub styled card */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -63,16 +75,38 @@ export default function Tickets() {
           boxShadow: "0 20px 50px -25px rgba(0,0,0,0.4)",
         }}
       >
-        {/* Flyer */}
+        {/* Flyer with the live count badge sitting on top of it */}
         <div style={{ flex: "1 1 340px", minHeight: "340px", position: "relative" }}>
           <img
             src={EVENT.flyer}
             alt={`${EVENT.name} flyer`}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
+
+          {availability && remaining !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{
+                position: "absolute",
+                top: "16px",
+                left: "16px",
+                background: soldOut ? "var(--gray-600)" : "var(--red)",
+                color: "var(--white)",
+                fontFamily: "var(--font-body)",
+                fontWeight: 700,
+                fontSize: "12px",
+                letterSpacing: "0.04em",
+                padding: "8px 16px",
+                borderRadius: "999px",
+                boxShadow: "0 8px 20px -6px rgba(0,0,0,0.5)",
+              }}
+            >
+              {soldOut ? "SOLD OUT" : `${remaining} TICKETS LEFT`}
+            </motion.div>
+          )}
         </div>
 
-        {/* Perforated divider (desktop only) */}
         <div
           style={{
             width: "0",
@@ -81,7 +115,6 @@ export default function Tickets() {
           }}
         />
 
-        {/* Details */}
         <div
           style={{
             flex: "1 1 360px",
@@ -135,15 +168,20 @@ export default function Tickets() {
           </div>
 
           <motion.button
-            onClick={() => setOpen(true)}
-            whileHover={{
-              scale: 1.03,
-              boxShadow: "0 0 0 3px var(--red), 0 18px 40px -14px rgba(226,0,26,0.6)",
-            }}
-            whileTap={{ scale: 0.97 }}
+            onClick={() => !soldOut && setOpen(true)}
+            disabled={soldOut}
+            whileHover={
+              soldOut
+                ? {}
+                : {
+                    scale: 1.03,
+                    boxShadow: "0 0 0 3px var(--red), 0 18px 40px -14px rgba(226,0,26,0.6)",
+                  }
+            }
+            whileTap={soldOut ? {} : { scale: 0.97 }}
             style={{
               marginTop: "32px",
-              background: "var(--red)",
+              background: soldOut ? "var(--gray-600)" : "var(--red)",
               color: "var(--white)",
               fontFamily: "var(--font-display)",
               fontSize: "20px",
@@ -151,14 +189,16 @@ export default function Tickets() {
               padding: "16px 0",
               borderRadius: "999px",
               width: "100%",
+              opacity: soldOut ? 0.6 : 1,
+              cursor: soldOut ? "not-allowed" : "pointer",
             }}
           >
-            GET TICKETS
+            {soldOut ? "SOLD OUT" : "GET TICKETS"}
           </motion.button>
         </div>
       </motion.div>
 
-      {open && <TicketModal event={EVENT} onClose={() => setOpen(false)} />}
+      {open && !soldOut && <TicketModal event={EVENT} onClose={() => setOpen(false)} />}
     </section>
   );
 }
