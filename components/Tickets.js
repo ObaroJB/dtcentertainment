@@ -11,7 +11,7 @@ const EVENT = {
   venue: "Undisclosed",
   flyer: "/images/flyer1.jpeg",
   tiers: [
-    { name: "Regular", price: 8000 },
+    { name: "Early Bird", price: 3500 },
     
   ],
 };
