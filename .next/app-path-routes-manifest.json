@@ -1,0 +1,15 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/admin/page": "/admin",
+  "/api/admin/stats/route": "/api/admin/stats",
+  "/api/checkin/route": "/api/checkin",
+  "/api/create-order/route": "/api/create-order",
+  "/api/verify-payment/route": "/api/verify-payment",
+  "/cookies/page": "/cookies",
+  "/order/success/page": "/order/success",
+  "/page": "/",
+  "/privacy/page": "/privacy",
+  "/scan/page": "/scan",
+  "/terms/page": "/terms"
+}
