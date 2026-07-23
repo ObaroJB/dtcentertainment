@@ -1,11 +1,11 @@
 {
-  "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",
-  "/admin/page": "/admin",
+  "/_global-error/page": "/_global-error",
   "/api/admin/stats/route": "/api/admin/stats",
   "/api/checkin/route": "/api/checkin",
   "/api/create-order/route": "/api/create-order",
   "/api/verify-payment/route": "/api/verify-payment",
+  "/admin/page": "/admin",
   "/cookies/page": "/cookies",
   "/order/success/page": "/order/success",
   "/page": "/",
