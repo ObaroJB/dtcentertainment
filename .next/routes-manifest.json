@@ -54,6 +54,12 @@
       "namedRegex": "^/api/admin/stats(?:/)?$"
     },
     {
+      "page": "/api/availability",
+      "regex": "^/api/availability(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/availability(?:/)?$"
+    },
+    {
       "page": "/api/checkin",
       "regex": "^/api/checkin(?:/)?$",
       "routeKeys": {},
